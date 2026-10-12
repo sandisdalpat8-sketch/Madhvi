@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Love ❤️</title>
+    <!-- Google Fonts & Canvas Confetti -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffe6e8 0%, #ffc3a0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* --- LOCK SCREEN STYLES --- */
+        .lock-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .lock-container h2 {
+            color: #d63384;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .lock-container input {
+            width: 90%;
+            padding: 16px;
+            border: 2px solid #ff4d6d;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 20px;
+            outline: none;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .btn {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #c71585;
+            transform: scale(1.05);
+        }
+
+        .btn-hint {
+            background: #6c757d;
+            font-size: 13px;
+            padding: 6px 15px;
+        }
+
+        .hint-text {
+            color: #d63384;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* --- POPUP MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.7); }
+            to { transform: scale(1); }
+        }
+
+        .modal-box h3 {
+            color: #ff4d6d;
+            margin-bottom: 15px;
+        }
+
+        .modal-box img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        /* --- MAIN CARD STYLES --- */
+        .card-container {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 25px;
+            padding: 40px 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 42px;
+            color: #ff4d6d;
+            margin-bottom: 5px;
+        }
+
+        /* --- SUBTITLE --- */
+        .subtitle {
+            color: #000000 !important;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* --- STRING & HANGING PHOTOS --- */
+        .string-container {
+            position: relative;
+            width: 100%;
+            margin: 40px 0;
+            padding-top: 30px;
+        }
+
+        .string-line {
+            position: absolute;
+            top: 0;
+            left: 5%;
+            width: 90%;
+            height: 4px;
+            background: #8b5a2b;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .photos-wrapper {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px;
+        }
+
+        /* HIGHER PHOTO SIZE (LARGER POLAROID) */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 30px 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+            border-radius: 6px;
+            position: relative;
+            width: 230px; /* Moto size */
+            transition: transform 0.3s ease;
+        }
+
+        .polaroid:nth-child(odd) { transform: rotate(-4deg); }
+        .polaroid:nth-child(even) { transform: rotate(5deg); }
+
+        .polaroid:hover {
+            transform: scale(1.1) rotate(0deg);
+            z-index: 5;
+        }
+
+        .clip {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 28px;
+            background: #d4a373;
+            border-radius: 3px;
+            border: 1px solid #a37148;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 230px; /* Moti height */
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .polaroid .caption {
+            font-family: 'Dancing Script', cursive;
+            font-size: 22px; /* Moti caption */
+            margin-top: 12px;
+            color: #d63384;
+            font-weight: bold;
+        }
+
+        /* --- SHAYARI SECTION --- */
+        .shayari-box {
+            background: #fff0f3;
+            border-left: 6px solid #ff4d6d;
+            padding: 22px;
+            border-radius: 12px;
+            margin: 30px 10px;
+            font-style: normal;
+            color: #000000 !important;
+            line-height: 2;
+            font-size: 22px;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.15);
+        }
+
+        .compliments {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #d63384;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .header-title { font-size: 32px; }
+            .subtitle { font-size: 17px; }
+            .polaroid { width: 180px; } /* Mobile ma પણ મોટા દેખાશે */
+            .polaroid img { height: 180px; }
+            .shayari-box { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND MUSIC -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://files.catbox.moe/drsrtm.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- 1. LOCK SCREEN -->
+    <div class="lock-container" id="lockScreen">
+        <h2>🔒 Enter Secret Code</h2>
+        <p style="color: #d63384; font-size: 20px; margin-bottom: 15px;">યાદ નય હોય તો તારી ગાંડ ફાડી નાખી!</p>
+        
+        <input type="password" id="passInput" placeholder="****" maxlength="4">
+        <br>
+        <button class="btn" id="unlockBtn">Unlock ❤️</button>
+        <br>
+        <button class="btn btn-hint" id="hintBtn">hint?</button>
+        <div class="hint-text" id="hintBox">Hint: bike 🏍️</div>
+    </div>
+
+    <!-- 2. CUTE WRONG PASSWORD POPUP -->
+    <div class="modal-overlay" id="wrongPassModal">
+        <div class="modal-box">
+            <img src="https://media.tenor.com/y5q72K88p34AAAAC/cute-bear-kissy.gif" alt="Cute Bear">
+            <h3 style="color: #ff4d6d;">Arre O Majnu! 🤭</h3>
+            <p style="color: #555; margin-bottom: 15px;">Khoto password chhe! આટલુ યાદ નથી લોડી 😠! 💖</p>
+            <button class="btn" id="wrongPassOkBtn">Try Again ✨</button>
+        </div>
+    </div>
+
+    <!-- 3. QUESTION POPUP AFTER 3 WRONG ATTEMPTS -->
+    <div class="modal-overlay" id="questionModal">
+        <div class="modal-box">
+            <h3>Tare hakikat ma jovu chhe shu chhe? 🤔</h3>
+            <p style="color: #555; margin-bottom: 20px;">Shu tare sachae ma aa open karva mange chho?</p>
+            <button class="btn" id="modalYes1">YES 💕</button>
+            <button class="btn" style="background: #6c757d;" id="modalNo1">NO 😜</button>
+        </div>
+    </div>
+
+    <!-- 4. ANGRY TEDDY POPUP FOR 'NO' -->
+    <div class="modal-overlay" id="angryModal">
+        <div class="modal-box">
+            <img src="https://media.tenor.com/2s4P0X_3a9AAAAAC/angry-bear.gif" alt="Angry Teddy">
+            <h3 style="color: #d90429;">HOW DARE YOU! 😡</h3>
+            <p style="color: #555; margin-bottom: 15px;">કેમ સોદુ તારે નથી જોવુ !</p>
+            <button class="btn" id="modalYes2">Okay, YES! ❤️</button>
+        </div>
+    </div>
+
+    <!-- 5. MAIN UNLOCKED CARD -->
+    <div class="card-container" id="mainCard">
+        <h1 class="header-title">special for my ghhachu's mummy ✨</h1>
+        <p class="subtitle">Tu Mari Life Ni Sauthi Sundar Safar Chhe... ❤️</p>
+
+        <!-- Dori with Hanging Photos -->
+        <div class="string-container">
+            <div class="string-line"></div>
+            <div class="photos-wrapper">
+                
+                <div class="polaroid">
+                    <div class="clip"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1i-FdP2PiSSy-h7dqc_i7vIe8P1_nc5y7" alt="Photo 1">
+                    <div class="caption">Cute Moments 💖</div>
+                </div>
+
+                <div class="polaroid">
+                    <div class="clip"></div>
+                    <img src="https://lh3.googleusercontent.com/d/16go5Ru80fZuGYY5tLpAJK15yqdrVrZzB" alt="Photo 2">
+                    <div class="caption">Best Memories ✨</div>
+                </div>
+
+                <div class="polaroid">
+                    <div class="clip"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1y7X6UMKgOAAnpPQsroaPQ9IjJ8PoQiLv" alt="Photo 3">
+                    <div class="caption">Forever & Always 💕</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Shayari Section -->
+        <div class="shayari-box">
+            "તુજ મારી ગામા થિટા,<br>
+            તૂજ કાપી મારા શિઠા,<br>
+            ગાડી વગર નકામો ઘોડો,<br>
+            તને જોય સલામી ભરે મારો લોડો!<br><br>
+            તુજ મારી આબરુ તુજ મારી ઇજ્જત તૂજ મારુ માન,<br>
+            હૂ તને બોવ પ્રેમ કરુ છુ i love you mari jaan ❤️" 🔥
+        </div>
+
+        <div class="compliments">
+            ✨ Your smile brightens my entire world. <br>
+            ✨ You're the sweetest part of my everyday life! 💕
+        </div>
+    </div>
+
+    <script>
+        let wrongAttempts = 0;
+        let isMusicPlaying = false;
+
+        function playAudio() {
+            if (!isMusicPlaying) {
+                const music = document.getElementById('bgMusic');
+                music.play().then(() => {
+                    isMusicPlaying = true;
+                }).catch(e => console.log("Audio play waiting for interaction"));
+            }
+        }
+
+        document.addEventListener('click', playAudio, { once: true });
+        document.addEventListener('touchstart', playAudio, { once: true });
+
+        document.getElementById('hintBtn').addEventListener('click', function() {
+            const hintBox = document.getElementById('hintBox');
+            hintBox.style.display = hintBox.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('unlockBtn').addEventListener('click', function() {
+            checkPassword();
+        });
+
+        document.getElementById('passInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        function checkPassword() {
+            const input = document.getElementById('passInput').value;
+            
+            if (input === "2653") {
+                unlockCard();
+            } else {
+                wrongAttempts++;
+                document.getElementById('passInput').value = "";
+                
+                if (wrongAttempts < 3) {
+                    document.getElementById('wrongPassModal').classList.add('active');
+                } else {
+                    document.getElementById('questionModal').classList.add('active');
+                }
+            }
+        }
+
+        document.getElementById('wrongPassOkBtn').addEventListener('click', function() {
+            document.getElementById('wrongPassModal').classList.remove('active');
+        });
+
+        document.getElementById('modalNo1').addEventListener('click', function() {
+            document.getElementById('questionModal').classList.remove('active');
+            document.getElementById('angryModal').classList.add('active');
+        });
+
+        document.getElementById('modalYes1').addEventListener('click', function() {
+            document.getElementById('questionModal').classList.remove('active');
+            document.getElementById('angryModal').classList.remove('active');
+            unlockCard();
+        });
+
+        document.getElementById('modalYes2').addEventListener('click', function() {
+            document.getElementById('angryModal').classList.remove('active');
+            unlockCard();
+        });
+
+        function unlockCard() {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('mainCard').style.display = 'block';
+            
+            playAudio();
+            
+            setTimeout(() => {
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 120,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>
